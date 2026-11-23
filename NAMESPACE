@@ -4,7 +4,7 @@ importFrom("Compositional", kl.compreg, diri.reg.irls)
 importFrom("Compositionalcln", cln.reg)
 importFrom("CompositionalSR", areg)
 importFrom("CompositionalZADR", zadr.irls)
-importFrom("stats", cov)
+importFrom("stats", cov, complete.cases)
 
 
 exportPattern("^[[:alpha:]]+")

@@ -1,5 +1,5 @@
-\name{jack.boot}
-\alias{jack.boot}
+\name{clust.jack}
+\alias{clust.jack}
 \title{
 Cluster jackknife covariance matrix of the regression coefficients in compositional regression models
 }
@@ -11,7 +11,7 @@ parallel computing.
 }
 
 \usage{
-jack.boot(y, x, type = "kl", a = 1, id = NULL, center = "mean", ncores = 1)
+clust.jack(y, x, type = "kl", a = 1, id = NULL, center = "mean", ncores = 1)
 }
 
 \arguments{
@@ -146,11 +146,11 @@ y <- t( apply(mu, 1, function(p) rgamma(3, 20 * p) ) )
 y <- y / rowSums(y)
 
 ## cluster jackknife
-mod <- jack.boot(y, x, type = "kl", id = id)
+mod <- clust.jack(y, x, type = "kl", id = id)
 mod$be
 sqrt( diag(mod$covb) )
 
 ## centred at the full sample estimate
-mod2 <- jack.boot(y, x, type = "kl", id = id, center = "full")
+mod2 <- clust.jack(y, x, type = "kl", id = id, center = "full")
 sqrt( diag(mod2$covb) )
 }
