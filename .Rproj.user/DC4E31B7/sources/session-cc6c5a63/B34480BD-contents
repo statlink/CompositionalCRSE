@@ -1,0 +1,67 @@
+library(Directional)
+library(Rfast)
+library(vMVS)
+library(circda)
+source("vm.lasso.R")
+source("cv.vm.lasso.R")
+source("vm.alasso.R")
+source("cv.vm.alasso.R")
+library(parallel)
+library(xtable)
+
+
+z <- read.csv( "nhanes_bedtime.csv" )
+y <- z[, 1]
+x <- as.matrix(z[, -1])
+R <- 20
+n <- length(y)
+nama <- colnames(x)
+
+png("clock.png", width = 3000, height = 3000, res = 600)
+
+clockplot(y, bins = 72)
+
+dev.off()
+
+res <- matrix(nrow = R, ncol = 13)
+colnames(res) <- c("gomp-time", "lasso-time", "alasso-time", "pvalue-sel", "ebic-sel", 
+              "lasso-sel", "alasso-sel", "pvalue-perf", "ebic-perf", "lasso-perf", 
+              "alasso-perf", "lasso-lambda", "alasso-lambda")
+
+for ( i in 1:R ) {
+  folds <- makefolds(1:n, nfolds = 10, stratified = FALSE)
+  ### gOMP
+  a  <- cv.vm.gomp(y, x, folds = folds, ncores = 10)
+  a1 <- vm.gomp(y, x, ncores = 10)
+  s1 <- a1$pvalue.res[-1, 1]   ;   s2 <- a1$ebic.res[-1, 1]
+  ## (A)LASSO
+  b1 <- cv.vm.lasso(y, x, folds = folds, model = TRUE, ncores = 10)
+  b2 <- cv.vm.alasso(y, x, folds = folds, model = TRUE, ncores = 10)
+  res[i, ] <- c( a$runtime[3] + a1$runtime[3], b1$runtime[3], b2$runtime[3],
+                 length(s1), length(s2), sum( Rfast::rowsums( abs(b1$be) ) > 0 ) - 1, 
+                 sum( Rfast::rowsums( abs(b2$be) ) > 0 ) - 1,
+                 a$perf[1], a$perf[2], b1$perf[2], b2$perf[2], b1$perf[1], b2$perf[2] )
+
+save.image("real.RData")
+}
+
+
+res <- write.csv(res[, -c(1:3)], "res.csv")
+
+B1 <- vm.reg(y, x[, a1$pvalue.res[-1, 1]] )$be
+rownames(B1) <- c( "constant", nama[ a1$pvalue.res[-1, 1] ] )
+ind <- which( Rfast::rowsums( abs(b1$be) ) > 0 ) 
+B3 <- b1$be[ind, ]
+ind <- which( Rfast::rowsums( abs(b2$be) ) > 0 ) 
+B4 <- b2$be[ind, ]
+
+pv <- eb <- list()
+for ( i in 1:100 ) {
+  ind <- sample.int(n, n, replace = TRUE)
+  a1 <- vm.gomp(y[ind], x[ind, ], sequential = TRUE, ncores = 10)
+  pv[[ i ]] <- a1$pvalue.res[-1, 1] 
+  eb[[ i ]] <- a1$ebic.res[-1, 1]  
+}
+
+
+  

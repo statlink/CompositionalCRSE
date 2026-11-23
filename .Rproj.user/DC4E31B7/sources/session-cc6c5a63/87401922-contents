@@ -1,0 +1,13 @@
+Package: CompositionalCRSE
+Type: Package
+Title: Cluster Robust Standard Errors for Compositional Data Regression Models
+Version: 1.0
+Date: 2026-11-23
+Authors@R: person("Michail", "Tsagris", role = c("aut", "cre"), email = "mtsagris@uoc.gr")
+Author: Michail Tsagris [aut, cre]
+Maintainer: Michail Tsagris <mtsagris@uoc.gr>
+Depends: R (>= 4.0)
+Imports: Compositional, Compositionalcln, CompositionalSR, CompositionalZADR, stats
+Suggests: Rfast, Rfast2
+Description: Functions to compute cluster robust standard errors (and covariance matrices) of some regression models for compositional data with and without zero values present. The cluster bootstrap follows Davison A.C. and Hinkley D.V. (1997) <doi:10.1017/CBO9780511802843>, Field C.A. and Welsh A.H. (2007) <doi:10.1111/j.1467-9868.2007.00593.x> and Cameron A.C., Gelbach J.B. and Miller D.L. (2008) <doi:10.1162/rest.90.3.414>. The regression models covered are: the log-ratio regression of Aitchison J. (1986, ISBN: 978-0-412-28060-3); the Kullback-Leibler divergence regression of Murteira J.M.R. and Ramalho J.J.S. (2016) <doi:10.1080/07474938.2013.806849> and Alenazi A.A. (2022) <doi:10.18187/pjsor.v18i4.3969>; the Dirichlet regression of Maier M.J. (2014) <https://epub.wu.ac.at/4077/>; the zero adjusted Dirichlet regression of Tsagris M. and Stewart C. (2018) <doi:10.1134/S1995080218030198>; and the conditional logistic normal regression of Alzeley O. and Tsagris M. (2026) <doi:10.48550/arXiv.2608.29954>.
+License: GPL (>= 2)

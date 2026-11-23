@@ -1,0 +1,10 @@
+#useDynLib(pchc, .registration = TRUE)
+
+importFrom("Compositional", kl.compreg, diri.reg.irls)
+importFrom("Compositionalcln", cln.reg)
+importFrom("CompositionalSR", areg)
+importFrom("CompositionalZADR", zadr.reg.irls)
+
+exportPattern("^[[:alpha:]]+")
+exportPattern("^[^\\.]")
+

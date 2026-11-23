@@ -1,0 +1,143 @@
+\name{clust.boot}
+\alias{clust.boot}
+\title{
+Cluster bootstrap covariance matrix of the regression coefficients in compositional regression models
+}
+
+\description{
+Cluster (or ordinary) bootstrap estimate of the covariance matrix of the regression coefficients
+of several regression models for compositional data, with optional parallel computing.
+}
+
+\usage{
+clust.boot(y, x, type = "kl", a = 1, id = NULL, B = 999, ncores = 1)
+}
+
+\arguments{
+\item{y}{
+A matrix with the compositional data (the response variable). The rows must sum to 1.
+}
+\item{x}{
+A vector or a numerical matrix with the predictor variables.
+Factors or character variables are not allowed.
+}
+\item{type}{
+The regression model to be fitted. Possible values are: "lm" for multivariate
+linear regression on the additive log-ratio transformed compositional data,
+"kl" for the Kullback-Leibler divergence based regression (\code{\link[Compositional]{kl.compreg}}),
+"diri" for Dirichlet regression (\code{\link[Compositional]{diri.reg.irls}}), "zadr"
+for zero-adjusted Dirichlet regression (\code{zadr.irls} of the package \bold{CompositionalZADR}),
+"areg" for the \eqn{\alpha}-regression (\code{areg} of the package \bold{CompositionalSR}) and
+"cln" for the conditional logistic normal regression (\code{cln.reg} of the package
+\bold{Compositionalcln}).
+}
+\item{a}{
+The value of the power transformation \eqn{\alpha}, used only when type = "areg".
+This is treated as fixed and is not re-selected within each bootstrap sample.
+}
+\item{id}{
+A vector with the cluster indicators, one value for every observation. If NULL (default)
+each observation is treated as its own cluster and the ordinary (non-parametric) bootstrap
+is performed.
+}
+\item{B}{
+The number of bootstrap samples.
+}
+\item{ncores}{
+The number of cores to use. If greater than 1, the bootstrap samples are run in parallel
+using \code{\link[parallel]{parSapply}}, and the package required by the selected model is
+loaded on every worker.
+}
+}
+
+\details{
+The clusters (whole groups of observations sharing the same value of \code{id}) are
+resampled with replacement and the model is refitted to each bootstrap sample.
+Since the clusters are kept intact, the within-cluster correlation is preserved
+and no working correlation structure needs to be specified. The bootstrap covariance
+matrix is then the sample covariance matrix of the bootstrap estimates. When \code{id}
+is NULL this reduces to the ordinary bootstrap.
+
+The regression coefficients are vectorised column-wise, so the first \eqn{p+1} elements
+correspond to the coefficients (constant and \eqn{p} predictor variables) of the second
+component, the next \eqn{p+1} to the third component and so on. The row and column names
+of the covariance matrix reflect this ordering.
+
+Bootstrap samples for which the model cannot be fitted (for example because of zero
+values with type = "lm" or type = "diri") are discarded. For type = "lm" the compositional
+data must contain no zero values.
+
+The number of clusters should not be too small (say at least 30); otherwise the bootstrap
+covariance matrix tends to underestimate the true variability.
+}
+
+\value{
+A list including:
+\item{be}{
+The matrix of the estimated regression coefficients, fitted to the full data.
+}
+\item{covb}{
+The bootstrap covariance matrix of the vectorised regression coefficients.
+}
+}
+
+\references{
+Davison A.C. and Hinkley D.V. (1997). Bootstrap Methods and their Application. Cambridge University Press.
+
+Field C.A. and Welsh A.H. (2007). Bootstrapping clustered data.
+Journal of the Royal Statistical Society: Series B, 69(3): 369--390.
+
+Cameron A.C., Gelbach J.B. and Miller D.L. (2008). Bootstrap-based improvements for inference with
+clustered errors. The Review of Economics and Statistics, 90(3): 414--427.
+
+Tsagris M. and Stewart C. (2018). A Dirichlet regression model for compositional data with zeros.
+Lobachevskii Journal of Mathematics,39(3): 398--412.
+
+Alzeley O. and Tsagris M. (2026). Modelling compositional data with structural zero values
+https://arxiv.org/pdf/2608.29954
+
+Aitchison J. (1986). The statistical analysis of compositional data, pages 272--274.
+
+Murteira Jose MR, and Joaquim JS Ramalho (2016). Regression analysis of multivariate fractional data.
+Econometric Reviews 35(4): 515-552.
+
+Alenazi A. A. (2022). f-divergence regression models for compositional data.
+Pakistan Journal of Statistics and Operation Research, 18(4): 867--882.
+
+Maier Marco J. (2014) DirichletReg: Dirichlet Regression for Compositional Data in R.
+Research Report Series/Department of Statistics and Mathematics, 125. WU Vienna University of
+Economics and Business, Vienna.
+
+Mardia K.V., Kent J.T., and Bibby J.M. (1979). Multivariate analysis. Academic press.
+}
+
+\author{
+Michail Tsagris.
+
+R implementation and documentation: Michail Tsagris \email{mtsagris@uoc.gr}.
+}
+
+%\seealso{
+%}
+
+\examples{
+set.seed(1)
+G <- 30  ;  m <- 5  ;  n <- G * m
+id <- rep(1:G, each = m)
+x <- matrix( rnorm(n * 2), ncol = 2 )
+u <- matrix( rnorm(G * 2, sd = 0.5), ncol = 2 )[id, ]
+be <- rbind( c(0.5, -0.3), c(1, 0), c(0, -0.8) )
+mu <- cbind( 1, exp( cbind(1, x) \%*\% be + u ) )
+mu <- mu / rowSums(mu)
+y <- t( apply(mu, 1, function(p) rgamma(3, 20 * p) ) )
+y <- y / rowSums(y)
+
+## cluster bootstrap
+mod <- clust.boot(y, x, type = "kl", id = id, B = 50)
+mod$be
+sqrt( diag(mod$covb) )
+
+## ordinary bootstrap
+mod2 <- clust.boot(y, x, type = "kl", B = 50)
+sqrt( diag(mod2$covb) )
+}

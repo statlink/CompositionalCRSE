@@ -1,0 +1,132 @@
+\name{circplot}
+\alias{circplot}
+\alias{clockplot}
+\title{
+Circular plot and clock plot
+}
+
+\description{
+Circular plot of circular data, with the data stacked around the unit circle
+and an arrow pointing to the mean direction. \code{clockplot} draws the same
+plot as a 24-hour clock face, for data that are times of the day.
+}
+
+\usage{
+circplot(u, mu = NULL, rads = TRUE, labels = "both", type = "auto",
+bins = 72, maxh = 0.6, col = "#E76F51", lwd = 4, pt.col = "#2A9D8F", cex = 1.3,
+disc.col = "#F4F1EA", border.col = "#555555")
+
+clockplot(x, mu = NULL, rads = TRUE, type = "auto", bins = 48, maxh = 0.6,
+col = "#E76F51", lwd = 4, pt.col = "#2A9D8F", cex = 1.3,
+disc.col = "#F4F1EA", border.col = "#555555")
+}
+
+\arguments{
+\item{u}{
+A vector with the circular data expressed in radians, or degrees.
+}
+\item{x}{
+A vector with times of the day expressed as angles, in radians or degrees.
+The angle 0 corresponds to 24:00 and a full turn (\eqn{2\pi} or 360 degrees)
+corresponds to 24 hours, so \eqn{\pi/2} is 06:00 and \eqn{\pi} is 12:00.
+}
+\item{mu}{
+The estimated circular mean or a circular location estimate, in the same units
+as \code{u} (or \code{x}). If this is not available the circular mean is
+calculated internally.
+}
+\item{rads}{
+If the data (and \code{mu}) are expressed in degrees set this to FALSE.
+}
+\item{labels}{
+Which angle labels to show inside the disc: "both" (degrees above radians),
+"degrees" or "radians". Only used by \code{circplot}.
+}
+\item{type}{
+How to draw the data: "points" stacks the observations as points, "bars" draws
+a circular histogram with one bar per bin, and "auto" uses points when no bin
+contains more than 15 observations and bars otherwise.
+}
+\item{bins}{
+The number of bins (equal arcs) the circle is split into. For \code{clockplot}
+the default of 48 bins corresponds to half-hour intervals.
+}
+\item{maxh}{
+The maximum radial extent of the stacked points or bars outside the circle.
+}
+\item{col}{
+The colour of the arrow pointing to the mean direction.
+}
+\item{lwd}{
+The thickness of the above arrow of the circular mean.
+}
+\item{pt.col}{
+The fill colour of the points or bars.
+}
+\item{cex}{
+The size of the points. It is reduced automatically when the stacks would
+exceed \code{maxh}.
+}
+\item{disc.col}{
+The colour inside the disc.
+}
+\item{border.col}{
+The colour of the circle.
+}
+}
+
+\details{
+The observations are grouped into \code{bins} equal arcs. With \code{type = "points"}
+they are stacked outwards from the unit circle; with \code{type = "bars"} each arc
+gets a bar whose length is proportional to its count, which is preferable for
+large samples. The mean direction is computed as
+\eqn{\omega = atan2(\bar{S}, \bar{C}) \bmod 2\pi}, where
+\eqn{\bar{C} = n^{-1}\sum_{i=1}^n\cos\theta_i} and
+\eqn{\bar{S} = n^{-1}\sum_{i=1}^n\sin\theta_i}.
+
+\code{clockplot} places 24:00 at the top and runs clockwise, as on a clock, with
+06:00 on the right, 12:00 at the bottom and 18:00 on the left. Labels are shown
+every 3 hours and tick marks every hour.
+}
+
+\value{
+\code{circplot}: a circular plot. The mean direction (in radians) is returned invisibly.
+
+\code{clockplot}: a clock plot. A list is returned invisibly with components:
+\item{mu}{The mean direction in radians.}
+\item{time}{The mean time of the day as a character string "HH:MM".}
+}
+
+%\references{
+%}
+
+\author{
+Michail Tsagris.
+
+R implementation and documentation: Michail Tsagris \email{mtsagris@uoc.gr}.
+}
+
+%\note{
+%%  ~~further notes~~
+%}
+
+\seealso{
+\code{ \link{circ.mle}
+}
+}
+
+\examples{
+u <- rnorm(100, 0.3, 0.8)
+circplot(u)
+circplot(u, labels = "radians")
+circplot(u * 180 / pi, rads = FALSE, labels = "degrees")
+x <- rnorm(5000, 0.3, 0.8)
+circplot(x)   ## large sample, drawn as a circular histogram
+
+## times of the day around 22:30, converted from hours to radians
+h <- rnorm(100, 22.5, 1.5) \%\% 24
+y <- 2 * pi * h / 24
+m <- clockplot(y)
+m$time
+clockplot(y * 180 / pi, rads = FALSE)
+}
