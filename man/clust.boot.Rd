@@ -117,8 +117,9 @@ Michail Tsagris.
 R implementation and documentation: Michail Tsagris \email{mtsagris@uoc.gr}.
 }
 
-%\seealso{
-%}
+\seealso{
+\code{ \link{clust.jack} }
+}
 
 \examples{
 set.seed(1)
