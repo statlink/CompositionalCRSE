@@ -21,7 +21,7 @@ and the conditional logistic normal regression of Alzeley O. and Tsagris M. (202
 Package: \tab CompositionalCRSE\cr
 Type: \tab Package\cr
 Version: \tab 1.0 \cr
-Date: \tab 2026-11-23 \cr
+Date: \tab 2026-11-26 \cr
 }
 }
 
